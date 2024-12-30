@@ -81,7 +81,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b048fb63fd8b5923fc5aa7b340d8e156aec7ec02f0c78fa8a6ddc2613f6f71de"
 
 [[package]]
-name = "blaze_explorer"
+name = "blaze_explorer_lib"
 version = "0.5.0"
 dependencies = [
  "chrono",
@@ -108,7 +108,7 @@ dependencies = [
 name = "blaze_telescope"
 version = "0.1.0"
 dependencies = [
- "blaze_explorer",
+ "blaze_explorer_lib",
  "chrono",
  "color-eyre",
  "directories",

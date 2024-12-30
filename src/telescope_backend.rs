@@ -1,4 +1,4 @@
-use blaze_explorer_core::{action::Action, app_context::AppContext, themes::CustomTheme};
+use blaze_explorer_lib::{action::Action, app_context::AppContext, themes::CustomTheme};
 use color_eyre::eyre::Result;
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},

@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use ratatui::crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
-use blaze_explorer_core::{
+use blaze_explorer_lib::{
     action::Action,
     create_plugin_action,
     input_machine::{InputMachine, KeyMapNode, KeyProcessingResult},

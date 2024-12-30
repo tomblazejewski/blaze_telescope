@@ -1,4 +1,4 @@
-use blaze_explorer_core::{
+use blaze_explorer_lib::{
     action::{Action, PopupAction},
     line_entry::LineEntry,
 };

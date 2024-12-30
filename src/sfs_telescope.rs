@@ -14,7 +14,7 @@ use ratatui::{
 };
 use rust_search::SearchBuilder;
 
-use blaze_explorer_core::{
+use blaze_explorer_lib::{
     action::{Action, AppAction},
     app_context::AppContext,
 };

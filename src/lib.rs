@@ -11,19 +11,18 @@ use ratatui::{crossterm::event::KeyEvent, layout::Rect, widgets::Clear, Frame};
 use std::collections::HashMap;
 use telescope_backend::TelescopeBackend;
 
-use blaze_explorer_core::plugin::Plugin;
+use blaze_explorer_lib::plugin::Plugin;
 
-use blaze_explorer_core::{
-    action::{Action, AppAction}, //needs to be a lib
-    app::App,                    //needs to be a lib
+use blaze_explorer_lib::{
+    action::{Action, AppAction},
+    app::App,
     app_context::AppContext,
-    custom_action,                                      //needs to be a lib
-    input_machine::{InputMachine, KeyProcessingResult}, //needs to be a lib
-    line_entry::LineEntry,                              //needs to be a lib
-    mode::Mode,                                         //needs to be a lib
+    custom_action,
+    input_machine::{InputMachine, KeyProcessingResult},
+    line_entry::LineEntry,
+    mode::Mode,
+    plugin::plugin_popup::PluginPopUp,
 };
-
-use blaze_explorer_core::plugin::plugin_popup::PluginPopUp;
 
 //The plugin consists of the following parts
 //Struct Telescope - defines functionalities available at the app level. The app can bind any of
