@@ -42,7 +42,7 @@ pub fn open_sfs(app: &mut App) -> Option<Action> {
 }
 
 #[no_mangle]
-pub extern "Rust" fn get_telescope_plugin(
+pub extern "Rust" fn get_plugin(
     bindings_map: HashMap<(Mode, Vec<KeyEvent>), String>,
 ) -> Box<dyn Plugin> {
     Box::new(Telescope::new(bindings_map))
