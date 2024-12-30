@@ -14,10 +14,12 @@ use ratatui::{
 };
 use rust_search::SearchBuilder;
 
-use crate::{
+use blaze_explorer_core::{
     action::{Action, AppAction},
-    telescope::{AppContext, TelescopeResult, TelescopeSearch},
+    app_context::AppContext,
 };
+
+use crate::telescope_backend::{TelescopeResult, TelescopeSearch};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SearchFileshereSearch {

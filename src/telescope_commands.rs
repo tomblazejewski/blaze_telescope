@@ -1,5 +1,5 @@
-use crate::command::command_helpers::match_popup_call;
-use crate::{action::Action, app::App, command::Command};
+use blaze_explorer_core::command::command_helpers::match_popup_call;
+use blaze_explorer_core::{action::Action, app::App, command::Command};
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct TelescopeConfirmResult {}

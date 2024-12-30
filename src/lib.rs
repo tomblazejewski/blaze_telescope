@@ -1,18 +1,26 @@
+pub mod sfs_telescope;
+pub mod simple_input_machine;
+pub mod telescope_backend;
+pub mod telescope_commands;
+pub mod telescope_query;
+
+use simple_input_machine::TelescopeInputMachine;
+
 use color_eyre::eyre::Result;
 use ratatui::{crossterm::event::KeyEvent, layout::Rect, widgets::Clear, Frame};
 use std::collections::HashMap;
+use telescope_backend::TelescopeBackend;
 
 use blaze_explorer_core::plugin::Plugin;
 
 use blaze_explorer_core::{
-    action::{Action, AppAction},                        //needs to be a lib
-    app::App,                                           //needs to be a lib
+    action::{Action, AppAction}, //needs to be a lib
+    app::App,                    //needs to be a lib
+    app_context::AppContext,
     custom_action,                                      //needs to be a lib
     input_machine::{InputMachine, KeyProcessingResult}, //needs to be a lib
     line_entry::LineEntry,                              //needs to be a lib
     mode::Mode,                                         //needs to be a lib
-    simple_input_machine::TelescopeInputMachine,        //this itself needs to be part of the plugin
-    telescope::{AppContext, PopUpComponent, TelescopeBackend},
 };
 
 use blaze_explorer_core::plugin::plugin_popup::PluginPopUp;
@@ -33,6 +41,14 @@ pub fn open_sfs(app: &mut App) -> Option<Action> {
 
     None
 }
+
+#[no_mangle]
+pub extern "Rust" fn get_telescope_plugin(
+    bindings_map: HashMap<(Mode, Vec<KeyEvent>), String>,
+) -> Box<dyn Plugin> {
+    Box::new(Telescope::new(bindings_map))
+}
+
 #[derive(Debug, Clone)]
 pub struct Telescope {
     bindings_map: HashMap<(Mode, Vec<KeyEvent>), String>,
@@ -60,6 +76,10 @@ impl Plugin for Telescope {
         let mut map = HashMap::new();
         map.insert("OpenSFS".to_string(), Box::new(open_sfs as CustomAction));
         map
+    }
+
+    fn assign_keys(&mut self, bindings_map: HashMap<(Mode, Vec<KeyEvent>), String>) {
+        self.bindings_map = bindings_map;
     }
 
     fn get_bindings(&self) -> HashMap<(Mode, Vec<KeyEvent>), Action> {
