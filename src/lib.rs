@@ -1,10 +1,10 @@
 pub mod sfs_telescope;
-pub mod simple_input_machine;
 pub mod telescope_backend;
 pub mod telescope_commands;
+pub mod telescope_input_machine;
 pub mod telescope_query;
 
-use simple_input_machine::TelescopeInputMachine;
+use telescope_input_machine::TelescopeInputMachine;
 
 use color_eyre::eyre::Result;
 use ratatui::{crossterm::event::KeyEvent, layout::Rect, widgets::Clear, Frame};

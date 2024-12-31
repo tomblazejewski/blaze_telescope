@@ -11,7 +11,7 @@ impl TelescopeConfirmResult {
 }
 impl Command for TelescopeConfirmResult {
     fn execute(&mut self, app: &mut App) -> Option<Action> {
-        match_popup_call!(app, confirm_result)
+        match_popup_call!(app, confirm_result->Option<Action>)
     }
 }
 
