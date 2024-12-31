@@ -5,7 +5,9 @@ use crate::TelescopeWindow;
 //Plugin functions
 pub fn open_sfs(app: &mut App) -> Option<Action> {
     let ctx = app.get_app_context();
-    let popup = Box::new(TelescopeWindow::new_sfs(ctx));
+    let plugin = app.plugins.get("Telescope").unwrap();
+    let popup_keymap = plugin.get_popup_keymap();
+    let popup = Box::new(TelescopeWindow::new_sfs(ctx, popup_keymap));
     app.attach_popup(popup);
 
     None

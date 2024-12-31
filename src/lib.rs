@@ -95,6 +95,7 @@ pub fn get_functionalities() -> HashMap<String, Action> {
 //Default bindings
 pub fn get_default_bindings() -> HashMap<(Mode, Vec<KeyEvent>), String> {
     let mut bindings_map = HashMap::new();
+    insert_binding!(bindings_map, Mode::Normal, " sg", "OpenSFS");
     insert_binding!(bindings_map, Mode::PopUp, "<Esc>", "TelescopeQuit");
 
     insert_binding!(bindings_map, Mode::PopUp, "<C-n>", "TelescopeNextResult");
@@ -108,26 +109,39 @@ pub fn get_default_bindings() -> HashMap<(Mode, Vec<KeyEvent>), String> {
 
     insert_binding!(bindings_map, Mode::PopUp, "<BS>", "TelescopeDropSearchChar");
 
-    insert_binding!(
-        bindings_map,
-        Mode::PopUp,
-        "<Enter>",
-        "TelescopeConfirmResult"
-    );
+    insert_binding!(bindings_map, Mode::PopUp, "<CR>", "TelescopeConfirmResult");
     bindings_map
 }
 
 #[derive(Debug, Clone)]
 pub struct Telescope {
-    bindings_map: HashMap<(Mode, Vec<KeyEvent>), String>,
+    plugin_bindings: HashMap<(Mode, Vec<KeyEvent>), String>,
+    popup_bindings: HashMap<(Mode, Vec<KeyEvent>), String>,
     functionality_map: HashMap<String, Action>,
 }
 
 impl Telescope {
-    pub fn new(bindings_map: HashMap<(Mode, Vec<KeyEvent>), String>) -> Self {
+    pub fn new(custom_bindings_map: HashMap<(Mode, Vec<KeyEvent>), String>) -> Self {
         let functionality_map = get_functionalities();
+        let mut bindings_map = get_default_bindings();
+        bindings_map.extend(custom_bindings_map);
+
+        let mut plugin_bindings = HashMap::new();
+        let mut popup_bindings = HashMap::new();
+
+        for ((mode, events), string_repr) in bindings_map.iter() {
+            match mode {
+                Mode::PopUp => {
+                    popup_bindings.insert((mode.clone(), events.clone()), string_repr.clone());
+                }
+                _ => {
+                    plugin_bindings.insert((mode.clone(), events.clone()), string_repr.clone());
+                }
+            }
+        }
         Self {
-            bindings_map,
+            plugin_bindings,
+            popup_bindings,
             functionality_map,
         }
     }
@@ -144,36 +158,30 @@ impl Plugin for Telescope {
         map
     }
 
-    fn assign_keys(&mut self, bindings_map: HashMap<(Mode, Vec<KeyEvent>), String>) {
-        self.bindings_map = bindings_map;
+    fn get_plugin_bindings(&self) -> HashMap<(Mode, Vec<KeyEvent>), String> {
+        self.plugin_bindings.clone()
+    }
+    fn get_popup_bindings(&self) -> HashMap<(Mode, Vec<KeyEvent>), String> {
+        self.popup_bindings.clone()
     }
 
-    fn get_bindings(&self) -> HashMap<(Mode, Vec<KeyEvent>), Action> {
-        let mut output_map = HashMap::new();
-        for (key, value) in &self.bindings_map {
-            match self.functionality_map.get(value) {
-                Some(action) => {
-                    output_map.insert((*key).clone(), action.clone());
-                }
-                None => {}
-            }
-        }
-        output_map
+    fn get_functionality_map(&self) -> HashMap<String, Action> {
+        self.functionality_map.clone()
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TelescopeWindow {
-    input_machine: TelescopeInputMachine,
+    keymap: HashMap<(Mode, Vec<KeyEvent>), Action>,
     telescope_backend: TelescopeBackend,
     current_sequence: Vec<KeyEvent>,
     pub should_quit: bool,
 }
 
 impl TelescopeWindow {
-    pub fn new_sfs(ctx: AppContext) -> Self {
+    pub fn new_sfs(ctx: AppContext, keymap: HashMap<(Mode, Vec<KeyEvent>), Action>) -> Self {
         TelescopeWindow {
-            input_machine: TelescopeInputMachine::new(),
+            keymap,
             telescope_backend: TelescopeBackend::new_sfs(ctx),
             current_sequence: Vec::new(),
             should_quit: false,
@@ -186,24 +194,6 @@ impl TelescopeWindow {
     }
 }
 impl PluginPopUp for TelescopeWindow {
-    fn handle_key_event(&mut self, key_event: KeyEvent) -> Option<Action> {
-        let keymap_result =
-            self.input_machine
-                .process_keys(&Mode::Normal, &mut self.current_sequence, key_event);
-        match keymap_result {
-            KeyProcessingResult::Complete(action) => {
-                return Some(action);
-            }
-            KeyProcessingResult::Invalid => {
-                return self
-                    .input_machine
-                    .get_default_action(&Mode::Normal, key_event)
-            }
-            _ => {}
-        }
-        None
-    }
-
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> Result<()> {
         frame.render_widget(Clear, area);
         self.telescope_backend.draw(frame, area)?;
@@ -259,5 +249,24 @@ impl PluginPopUp for TelescopeWindow {
 
     fn get_default_action(&self) -> Box<fn(KeyEvent) -> Option<Action>> {
         Box::new(default_popup_action)
+    }
+    fn get_own_keymap(&self) -> HashMap<(Mode, Vec<KeyEvent>), Action> {
+        self.keymap.clone()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new_telescope() {
+        let mut custom_bindings = HashMap::new();
+        insert_binding!(custom_bindings, Mode::PopUp, "abcd", "TelescopeQuit");
+        let telescope = Telescope::new(custom_bindings.clone());
+        let obtained_bindings = telescope.bindings_map;
+        let mut expected_bindings = get_default_bindings();
+        expected_bindings.extend(custom_bindings);
+        assert_eq!(obtained_bindings, expected_bindings);
     }
 }
