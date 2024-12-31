@@ -4,6 +4,10 @@ pub mod telescope_commands;
 pub mod telescope_input_machine;
 pub mod telescope_query;
 
+use blaze_explorer_lib::command::key_press;
+use blaze_explorer_lib::create_plugin_action;
+use ratatui::crossterm::event::KeyCode;
+use telescope_commands::TelescopePushSearchChar;
 use telescope_input_machine::TelescopeInputMachine;
 
 use color_eyre::eyre::Result;
@@ -21,6 +25,7 @@ use blaze_explorer_lib::{
     input_machine::{InputMachine, KeyProcessingResult},
     line_entry::LineEntry,
     mode::Mode,
+    plugin::plugin_action::PluginAction,
     plugin::plugin_popup::PluginPopUp,
 };
 
@@ -46,6 +51,13 @@ pub extern "Rust" fn get_plugin(
     bindings_map: HashMap<(Mode, Vec<KeyEvent>), String>,
 ) -> Box<dyn Plugin> {
     Box::new(Telescope::new(bindings_map))
+}
+
+pub fn default_action(key_event: KeyEvent) -> Option<Action> {
+    match key_event.code {
+        KeyCode::Char(ch) => Some(create_plugin_action!(TelescopePushSearchChar, ch)),
+        _ => None,
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -188,5 +200,9 @@ impl PluginPopUp for TelescopeWindow {
 
     fn display_details(&self) -> String {
         "Telescope".to_string()
+    }
+
+    fn get_default_action(&self) -> Box<fn(KeyEvent) -> Option<Action>> {
+        Box::new(default_action)
     }
 }
