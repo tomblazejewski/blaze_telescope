@@ -4,10 +4,13 @@ pub mod telescope_commands;
 pub mod telescope_input_machine;
 pub mod telescope_query;
 
-use blaze_explorer_lib::command::key_press;
-use blaze_explorer_lib::create_plugin_action;
+use blaze_explorer_lib::{create_plugin_action, insert_binding};
+
 use ratatui::crossterm::event::KeyCode;
-use telescope_commands::TelescopePushSearchChar;
+use telescope_commands::{
+    open_sfs, TelescopeConfirmResult, TelescopeDropSearchChar, TelescopeNextResult,
+    TelescopePreviousResult, TelescopePushSearchChar, TelescopeQuit,
+};
 use telescope_input_machine::TelescopeInputMachine;
 
 use color_eyre::eyre::Result;
@@ -22,7 +25,9 @@ use blaze_explorer_lib::{
     app::App,
     app_context::AppContext,
     custom_action,
-    input_machine::{InputMachine, KeyProcessingResult},
+    input_machine::{
+        input_machine_helpers::convert_str_to_events, InputMachine, KeyProcessingResult,
+    },
     line_entry::LineEntry,
     mode::Mode,
     plugin::plugin_action::PluginAction,
@@ -36,16 +41,13 @@ use blaze_explorer_lib::{
 //plugin's functionalities and takes control of incoming KeyEvents
 //
 
+//Create types for simplicity
 type CustomAction = fn(&mut App) -> Option<Action>;
 type BoxedAction = Box<CustomAction>;
-pub fn open_sfs(app: &mut App) -> Option<Action> {
-    let ctx = app.get_app_context();
-    let popup = Box::new(TelescopeWindow::new_sfs(ctx));
-    app.attach_popup(popup);
 
-    None
-}
+//Plugin defaults:
 
+//Plugin getter
 #[no_mangle]
 pub extern "Rust" fn get_plugin(
     bindings_map: HashMap<(Mode, Vec<KeyEvent>), String>,
@@ -53,11 +55,66 @@ pub extern "Rust" fn get_plugin(
     Box::new(Telescope::new(bindings_map))
 }
 
-pub fn default_action(key_event: KeyEvent) -> Option<Action> {
+//Default Popup Action
+pub fn default_popup_action(key_event: KeyEvent) -> Option<Action> {
     match key_event.code {
         KeyCode::Char(ch) => Some(create_plugin_action!(TelescopePushSearchChar, ch)),
         _ => None,
     }
+}
+
+//Functionalities offered by the plugin
+pub fn get_functionalities() -> HashMap<String, Action> {
+    let mut functionality_map = HashMap::new();
+    functionality_map.insert("OpenSFS".to_string(), custom_action!(open_sfs));
+    functionality_map.insert(
+        "TelescopeQuit".to_string(),
+        create_plugin_action!(TelescopeQuit),
+    );
+    functionality_map.insert(
+        "TelescopeNextResult".to_string(),
+        create_plugin_action!(TelescopeNextResult),
+    );
+    functionality_map.insert(
+        "TelescopePreviousResult".to_string(),
+        create_plugin_action!(TelescopePreviousResult),
+    );
+    functionality_map.insert(
+        "TelescopeDropSearchChar".to_string(),
+        create_plugin_action!(TelescopeDropSearchChar),
+    );
+    functionality_map.insert(
+        "TelescopeConfirmResult".to_string(),
+        create_plugin_action!(TelescopeConfirmResult),
+    );
+    functionality_map.insert("OpenSFS".to_string(), custom_action!(open_sfs));
+
+    functionality_map
+}
+
+//Default bindings
+pub fn get_default_bindings() -> HashMap<(Mode, Vec<KeyEvent>), String> {
+    let mut bindings_map = HashMap::new();
+    insert_binding!(bindings_map, Mode::PopUp, "<Esc>", "TelescopeQuit");
+
+    insert_binding!(bindings_map, Mode::PopUp, "<C-n>", "TelescopeNextResult");
+
+    insert_binding!(
+        bindings_map,
+        Mode::PopUp,
+        "<C-p>",
+        "TelescopePreviousResult"
+    );
+
+    insert_binding!(bindings_map, Mode::PopUp, "<BS>", "TelescopeDropSearchChar");
+
+    insert_binding!(
+        bindings_map,
+        Mode::PopUp,
+        "<Enter>",
+        "TelescopeConfirmResult"
+    );
+    bindings_map
 }
 
 #[derive(Debug, Clone)]
@@ -68,9 +125,7 @@ pub struct Telescope {
 
 impl Telescope {
     pub fn new(bindings_map: HashMap<(Mode, Vec<KeyEvent>), String>) -> Self {
-        let mut functionality_map = HashMap::new();
-        functionality_map.insert("OpenSFS".to_string(), custom_action!(open_sfs));
-
+        let functionality_map = get_functionalities();
         Self {
             bindings_map,
             functionality_map,
@@ -203,6 +258,6 @@ impl PluginPopUp for TelescopeWindow {
     }
 
     fn get_default_action(&self) -> Box<fn(KeyEvent) -> Option<Action>> {
-        Box::new(default_action)
+        Box::new(default_popup_action)
     }
 }

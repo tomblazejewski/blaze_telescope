@@ -1,6 +1,17 @@
 use blaze_explorer_lib::command::command_helpers::match_popup_call;
 use blaze_explorer_lib::{action::Action, app::App, command::Command};
 
+use crate::TelescopeWindow;
+//Plugin functions
+pub fn open_sfs(app: &mut App) -> Option<Action> {
+    let ctx = app.get_app_context();
+    let popup = Box::new(TelescopeWindow::new_sfs(ctx));
+    app.attach_popup(popup);
+
+    None
+}
+
+//Popup functions
 #[derive(Clone, PartialEq, Debug)]
 pub struct TelescopeConfirmResult {}
 
