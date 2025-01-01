@@ -5,7 +5,17 @@ use crate::TelescopeWindow;
 //Plugin functions
 pub fn open_sfs(app: &mut App) -> Option<Action> {
     let ctx = app.get_app_context();
-    let plugin = app.plugins.get("Telescope").unwrap();
+    let plugin = match app.plugins.get("Telescope") {
+        None => {
+            return Some(Action::AppAct(
+                blaze_explorer_lib::action::AppAction::DisplayMessage(
+                    "Failed to fetch the Telescope plugin when trying to open the popup"
+                        .to_string(),
+                ),
+            ));
+        }
+        Some(plugin) => plugin,
+    };
     let popup_keymap = plugin.get_popup_keymap();
     let popup = Box::new(TelescopeWindow::new_sfs(ctx, popup_keymap));
     app.attach_popup(popup);
@@ -134,5 +144,23 @@ impl TelescopeEraseText {
 impl Command for TelescopeEraseText {
     fn execute(&mut self, app: &mut App) -> Option<Action> {
         match_popup_call!(app, erase_text)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use blaze_explorer_lib::action::AppAction;
+
+    use super::*;
+
+    #[test]
+    fn test_open_sfs_fails() {
+        let mut app = App::new().unwrap();
+        let result = open_sfs(&mut app);
+        let expected_result = Some(Action::AppAct(AppAction::DisplayMessage(
+            "Failed to fetch the Telescope plugin when trying to open the popup".to_string(),
+        )));
+
+        assert_eq!(result, expected_result);
     }
 }
