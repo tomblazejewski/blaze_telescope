@@ -1,20 +1,15 @@
 use blaze_explorer_lib::command::command_helpers::match_popup_call;
+use blaze_explorer_lib::plugin::plugin_helpers::{access_plugin, PluginFetchResult};
 use blaze_explorer_lib::{action::Action, app::App, command::Command};
 
 use crate::TelescopeWindow;
 //Plugin functions
 pub fn open_sfs(app: &mut App) -> Option<Action> {
     let ctx = app.get_app_context();
-    let plugin = match app.plugins.get("Telescope") {
-        None => {
-            return Some(Action::AppAct(
-                blaze_explorer_lib::action::AppAction::DisplayMessage(
-                    "Failed to fetch the Telescope plugin when trying to open the popup"
-                        .to_string(),
-                ),
-            ));
-        }
-        Some(plugin) => plugin,
+    let result = access_plugin(app, "Telescope");
+    let plugin = match result {
+        PluginFetchResult::Err(action) => return action,
+        PluginFetchResult::Ok(plugin) => plugin,
     };
     let popup_keymap = plugin.get_popup_keymap();
     let popup = Box::new(TelescopeWindow::new_sfs(ctx, popup_keymap));
