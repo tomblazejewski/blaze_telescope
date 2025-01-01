@@ -165,7 +165,6 @@ impl Plugin for Telescope {
 pub struct TelescopeWindow {
     keymap: HashMap<(Mode, Vec<KeyEvent>), Action>,
     telescope_backend: TelescopeBackend,
-    current_sequence: Vec<KeyEvent>,
     pub should_quit: bool,
 }
 
@@ -174,7 +173,6 @@ impl TelescopeWindow {
         TelescopeWindow {
             keymap,
             telescope_backend: TelescopeBackend::new_sfs(ctx),
-            current_sequence: Vec::new(),
             should_quit: false,
         }
     }
