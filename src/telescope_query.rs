@@ -60,3 +60,52 @@ impl TelescopeQuery {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_contents() {
+        let query = TelescopeQuery::new("prefix".to_string(), "suffix".to_string());
+        assert_eq!(query.get_contents(), "prefixsuffix");
+    }
+
+    #[test]
+    fn test_append_char() {
+        let mut query = TelescopeQuery::default();
+        query.append_char('a');
+        assert_eq!(query.get_contents(), "a");
+    }
+
+    #[test]
+    fn test_pop_contents() {
+        let mut query = TelescopeQuery::new("prefix".to_string(), "suffix".to_string());
+        query.append_char('a');
+        assert_eq!(query.pop_contents(), "a");
+    }
+
+    #[test]
+    fn test_drop_char() {
+        let mut query = TelescopeQuery::new("prefix".to_string(), "suffix".to_string());
+        query.append_char('a');
+        query.drop_char();
+        assert_eq!(query.get_contents(), "prefixsuffix");
+    }
+
+    #[test]
+    fn test_remove_char() {
+        let mut query = TelescopeQuery::new("prefix".to_string(), "suffix".to_string());
+        query.append_char('a');
+        query.remove_char();
+        assert_eq!(query.get_contents(), "prefixsuffix");
+    }
+
+    #[test]
+    fn test_clear_contents() {
+        let mut query = TelescopeQuery::new("prefix".to_string(), "suffix".to_string());
+        query.append_char('a');
+        query.clear_contents();
+        assert_eq!(query.get_contents(), "prefixsuffix");
+    }
+}
