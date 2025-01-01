@@ -23,9 +23,7 @@ use blaze_explorer_lib::{
     app::App,
     app_context::AppContext,
     custom_action,
-    input_machine::{
-        input_machine_helpers::convert_str_to_events, InputMachine, KeyProcessingResult,
-    },
+    input_machine::input_machine_helpers::convert_str_to_events,
     line_entry::LineEntry,
     mode::Mode,
     plugin::plugin_action::PluginAction,
@@ -249,7 +247,7 @@ impl PluginPopUp for TelescopeWindow {
 
 #[cfg(test)]
 mod tests {
-    use std::{env, path::PathBuf};
+    use std::env;
 
     use super::*;
 
