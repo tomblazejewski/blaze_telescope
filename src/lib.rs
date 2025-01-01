@@ -3,13 +3,14 @@ pub mod telescope_backend;
 pub mod telescope_commands;
 pub mod telescope_query;
 
+use blaze_explorer_lib::plugin::plugin_commands::{
+    PluginConfirmResult, PluginDropSearchChar, PluginNextResult, PluginPreviousResult,
+    PluginPushSearchChar, PluginQuit,
+};
 use blaze_explorer_lib::{create_plugin_action, insert_binding};
 
 use ratatui::crossterm::event::KeyCode;
-use telescope_commands::{
-    open_sfs, TelescopeConfirmResult, TelescopeDropSearchChar, TelescopeNextResult,
-    TelescopePreviousResult, TelescopePushSearchChar, TelescopeQuit,
-};
+use telescope_commands::open_sfs;
 
 use color_eyre::eyre::Result;
 use ratatui::{crossterm::event::KeyEvent, layout::Rect, widgets::Clear, Frame};
@@ -54,7 +55,7 @@ pub extern "Rust" fn get_plugin(
 //Default Popup Action
 pub fn default_popup_action(key_event: KeyEvent) -> Option<Action> {
     match key_event.code {
-        KeyCode::Char(ch) => Some(create_plugin_action!(TelescopePushSearchChar, ch)),
+        KeyCode::Char(ch) => Some(create_plugin_action!(PluginPushSearchChar, ch)),
         _ => None,
     }
 }
@@ -65,23 +66,23 @@ pub fn get_functionalities() -> HashMap<String, Action> {
     functionality_map.insert("OpenSFS".to_string(), custom_action!(open_sfs));
     functionality_map.insert(
         "TelescopeQuit".to_string(),
-        create_plugin_action!(TelescopeQuit),
+        create_plugin_action!(PluginQuit),
     );
     functionality_map.insert(
         "TelescopeNextResult".to_string(),
-        create_plugin_action!(TelescopeNextResult),
+        create_plugin_action!(PluginNextResult),
     );
     functionality_map.insert(
         "TelescopePreviousResult".to_string(),
-        create_plugin_action!(TelescopePreviousResult),
+        create_plugin_action!(PluginPreviousResult),
     );
     functionality_map.insert(
         "TelescopeDropSearchChar".to_string(),
-        create_plugin_action!(TelescopeDropSearchChar),
+        create_plugin_action!(PluginDropSearchChar),
     );
     functionality_map.insert(
         "TelescopeConfirmResult".to_string(),
-        create_plugin_action!(TelescopeConfirmResult),
+        create_plugin_action!(PluginConfirmResult),
     );
     functionality_map.insert("OpenSFS".to_string(), custom_action!(open_sfs));
 
