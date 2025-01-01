@@ -84,7 +84,6 @@ pub fn get_functionalities() -> HashMap<String, Action> {
         "TelescopeConfirmResult".to_string(),
         create_plugin_action!(PluginConfirmResult),
     );
-    functionality_map.insert("OpenSFS".to_string(), custom_action!(open_sfs));
 
     functionality_map
 }
