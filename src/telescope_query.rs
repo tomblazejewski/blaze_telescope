@@ -59,15 +59,4 @@ impl TelescopeQuery {
             suffix,
         }
     }
-    pub fn handle_text_action(&mut self, action: PopupAction) -> Option<Action> {
-        match action {
-            PopupAction::PushSearchChar(c) => self.append_char(c),
-            PopupAction::EraseText => self.clear_contents(),
-            PopupAction::DropSearchChar => return self.remove_char(),
-            _ => {}
-        }
-        Some(Action::PopupAct(PopupAction::UpdateSearchQuery(
-            self.contents.clone(),
-        )))
-    }
 }
