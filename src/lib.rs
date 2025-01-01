@@ -1,7 +1,6 @@
 pub mod sfs_telescope;
 pub mod telescope_backend;
 pub mod telescope_commands;
-pub mod telescope_input_machine;
 pub mod telescope_query;
 
 use blaze_explorer_lib::{create_plugin_action, insert_binding};
