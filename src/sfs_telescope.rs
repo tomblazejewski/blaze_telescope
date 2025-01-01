@@ -50,6 +50,7 @@ impl TelescopeSearch for SearchFileshereSearch {
             .build()
             .map(SearchFilesHereResult::new)
             .collect::<Vec<SearchFilesHereResult>>();
+        self.results.sort_by_key(|r| r.path.clone());
         self.last_search_timing = Some(start.elapsed());
     }
 

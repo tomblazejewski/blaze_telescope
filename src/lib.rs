@@ -11,7 +11,6 @@ use telescope_commands::{
     open_sfs, TelescopeConfirmResult, TelescopeDropSearchChar, TelescopeNextResult,
     TelescopePreviousResult, TelescopePushSearchChar, TelescopeQuit,
 };
-use telescope_input_machine::TelescopeInputMachine;
 
 use color_eyre::eyre::Result;
 use ratatui::{crossterm::event::KeyEvent, layout::Rect, widgets::Clear, Frame};
@@ -152,12 +151,6 @@ impl Plugin for Telescope {
         "Telescope".to_string()
     }
 
-    fn attach_functionality(&self, _app: &mut App) -> HashMap<String, BoxedAction> {
-        let mut map = HashMap::new();
-        map.insert("OpenSFS".to_string(), Box::new(open_sfs as CustomAction));
-        map
-    }
-
     fn get_plugin_bindings(&self) -> HashMap<(Mode, Vec<KeyEvent>), String> {
         self.plugin_bindings.clone()
     }
@@ -257,6 +250,8 @@ impl PluginPopUp for TelescopeWindow {
 
 #[cfg(test)]
 mod tests {
+    use std::{env, path::PathBuf};
+
     use super::*;
 
     #[test]
@@ -264,9 +259,24 @@ mod tests {
         let mut custom_bindings = HashMap::new();
         insert_binding!(custom_bindings, Mode::PopUp, "abcd", "TelescopeQuit");
         let telescope = Telescope::new(custom_bindings.clone());
-        let obtained_bindings = telescope.bindings_map;
+        let obtained_bindings = telescope.get_all_bindings();
         let mut expected_bindings = get_default_bindings();
         expected_bindings.extend(custom_bindings);
         assert_eq!(obtained_bindings, expected_bindings);
+    }
+
+    #[test]
+    fn test_confirm_result() {
+        let mut app = App::new().unwrap();
+        let ctx = app.get_app_context();
+        let mut sfs = TelescopeBackend::new_sfs(ctx);
+        sfs.update_search_query("folder".to_string());
+        sfs.table_state.select(Some(1));
+        let resulting_action = sfs.confirm_result();
+        //Get the root folder
+        let current_path = env::current_dir().unwrap();
+        let expected_path = current_path.join("tests/folder_2");
+        let expected_action = Some(Action::AppAct(AppAction::ShowInFolder(expected_path)));
+        assert_eq!(resulting_action, expected_action);
     }
 }
