@@ -192,26 +192,31 @@ impl PluginPopUp for TelescopeWindow {
         self.telescope_backend.confirm_result()
     }
 
-    fn next_result(&mut self) {
+    fn next_result(&mut self) -> Option<Action> {
         self.telescope_backend.next_result();
+        None
     }
 
-    fn previous_result(&mut self) {
+    fn previous_result(&mut self) -> Option<Action> {
         self.telescope_backend.previous_result();
+        None
     }
 
-    fn update_search_query(&mut self, query: String) {
+    fn update_search_query(&mut self, query: String) -> Option<Action> {
         self.telescope_backend.update_search_query(query);
+        None
     }
 
-    fn push_search_char(&mut self, ch: char) {
+    fn push_search_char(&mut self, ch: char) -> Option<Action> {
         self.telescope_backend.query.append_char(ch);
         self.update_self_query();
+        None
     }
 
-    fn drop_search_char(&mut self) {
+    fn drop_search_char(&mut self) -> Option<Action> {
         self.telescope_backend.query.drop_char();
         self.update_self_query();
+        None
     }
 
     fn quit(&mut self) {
@@ -222,9 +227,10 @@ impl PluginPopUp for TelescopeWindow {
         self.should_quit
     }
 
-    fn erase_text(&mut self) {
+    fn erase_text(&mut self) -> Option<Action> {
         self.telescope_backend.query.clear_contents();
         self.update_self_query();
+        None
     }
 
     fn get_search_query(&self) -> String {
