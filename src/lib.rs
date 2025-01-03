@@ -7,6 +7,7 @@ use blaze_explorer_lib::plugin::plugin_commands::{
     PluginConfirmResult, PluginDropSearchChar, PluginNextResult, PluginPreviousResult,
     PluginPushSearchChar, PluginQuit,
 };
+use blaze_explorer_lib::plugin::plugin_helpers::get_push_on_char_action;
 use blaze_explorer_lib::{create_plugin_action, insert_binding};
 
 use ratatui::crossterm::event::KeyCode;
@@ -50,14 +51,6 @@ pub extern "Rust" fn get_plugin(
     bindings_map: HashMap<(Mode, Vec<KeyEvent>), String>,
 ) -> Box<dyn Plugin> {
     Box::new(Telescope::new(bindings_map))
-}
-
-//Default Popup Action
-pub fn default_popup_action(key_event: KeyEvent) -> Option<Action> {
-    match key_event.code {
-        KeyCode::Char(ch) => Some(create_plugin_action!(PluginPushSearchChar, ch)),
-        _ => None,
-    }
 }
 
 //Functionalities offered by the plugin
@@ -242,7 +235,7 @@ impl PluginPopUp for TelescopeWindow {
     }
 
     fn get_default_action(&self) -> Box<fn(KeyEvent) -> Option<Action>> {
-        Box::new(default_popup_action)
+        Box::new(get_push_on_char_action)
     }
     fn get_own_keymap(&self) -> HashMap<(Mode, Vec<KeyEvent>), Action> {
         self.keymap.clone()
