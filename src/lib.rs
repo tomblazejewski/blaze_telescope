@@ -1,7 +1,6 @@
 pub mod sfs_telescope;
 pub mod telescope_backend;
 pub mod telescope_commands;
-pub mod telescope_query;
 
 use blaze_explorer_lib::plugin::plugin_commands::{
     PluginConfirmResult, PluginDropSearchChar, PluginNextResult, PluginPreviousResult,
@@ -176,7 +175,6 @@ impl TelescopeWindow {
 }
 impl PluginPopUp for TelescopeWindow {
     fn draw(&mut self, frame: &mut Frame, area: Rect) -> Result<()> {
-        frame.render_widget(Clear, area);
         self.telescope_backend.draw(frame, area)?;
         Ok(())
     }

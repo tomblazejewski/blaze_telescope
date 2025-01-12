@@ -1,18 +1,20 @@
-use blaze_explorer_lib::{action::Action, app_context::AppContext, themes::CustomTheme};
+use blaze_explorer_lib::{
+    action::Action, app_context::AppContext, query::Query, themes::CustomTheme, tools::center_rect,
+};
 use color_eyre::eyre::Result;
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
-    widgets::{Block, Borders, Cell, Paragraph, Row, Table, TableState},
+    widgets::{Block, Borders, Cell, Clear, Paragraph, Row, Table, TableState},
     Frame,
 };
 use std::fmt::Debug;
 use std::fmt::Display;
 
-use crate::{sfs_telescope::SearchFileshereSearch, telescope_query::TelescopeQuery};
+use crate::sfs_telescope::SearchFileshereSearch;
 
 #[derive(Debug, Clone)]
 pub struct TelescopeBackend {
-    pub query: TelescopeQuery,
+    pub query: Query,
     pub search: Box<dyn TelescopeSearch>,
     pub table_state: TableState,
     theme: CustomTheme,
@@ -69,6 +71,9 @@ impl TelescopeBackend {
 }
 impl TelescopeBackend {
     pub fn draw(&mut self, frame: &mut Frame, area: Rect) -> Result<()> {
+        //override the area to only take 80x80 of the total are
+        let area = center_rect(area, Constraint::Percentage(80), Constraint::Percentage(80));
+        frame.render_widget(Clear, area);
         //split the area vertically 60/40
         let chunks = Layout::default()
             .direction(Direction::Horizontal)
@@ -124,7 +129,7 @@ impl TelescopeBackend {
     pub fn new_sfs(search_context: AppContext) -> Self {
         //FIXME: Create a separate contructor for each type of search
         Self {
-            query: TelescopeQuery::default(),
+            query: Query::default(),
             search: Box::new(SearchFileshereSearch::new(search_context)),
             table_state: TableState::default(),
             theme: CustomTheme::default(),
