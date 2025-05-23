@@ -19,7 +19,7 @@ use blaze_explorer_lib::{
     app_context::AppContext,
 };
 
-use crate::telescope_backend::{TelescopeResult, TelescopeSearch};
+use crate::engine::{TelescopeResult, TelescopeSearch};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SearchFileshereSearch {

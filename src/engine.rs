@@ -1,3 +1,4 @@
+pub mod sfs_telescope;
 use blaze_explorer_lib::{
     action::Action, app_context::AppContext, query::Query, themes::CustomTheme, tools::center_rect,
 };
@@ -10,7 +11,7 @@ use ratatui::{
 use std::fmt::Debug;
 use std::fmt::Display;
 
-use crate::sfs_telescope::SearchFileshereSearch;
+use sfs_telescope::SearchFileshereSearch;
 
 #[derive(Debug, Clone)]
 pub struct TelescopeBackend {

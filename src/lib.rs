@@ -1,5 +1,4 @@
-pub mod sfs_telescope;
-pub mod telescope_backend;
+pub mod engine;
 pub mod telescope_commands;
 
 use blaze_explorer_lib::plugin::plugin_commands::{
@@ -13,9 +12,9 @@ use ratatui::crossterm::event::KeyCode;
 use telescope_commands::open_sfs;
 
 use color_eyre::eyre::Result;
+use engine::TelescopeBackend;
 use ratatui::{crossterm::event::KeyEvent, layout::Rect, widgets::Clear, Frame};
 use std::collections::HashMap;
-use telescope_backend::TelescopeBackend;
 
 use blaze_explorer_lib::plugin::Plugin;
 
@@ -244,6 +243,8 @@ impl PluginPopUp for TelescopeWindow {
 mod tests {
     use std::env;
 
+    use blaze_explorer_lib::testing_utils::create_custom_testing_folder;
+
     use super::*;
 
     #[test]
@@ -259,15 +260,18 @@ mod tests {
 
     #[test]
     fn test_confirm_result() {
-        let mut app = App::new().unwrap();
+        let mut app: App = App::new_test().unwrap();
+        let testing_folder =
+            create_custom_testing_folder(vec!["files/", "files/folder_2"]).unwrap();
+        app.update_path(testing_folder.root_dir.path().to_path_buf(), None);
         let ctx = app.get_app_context();
         let mut sfs = TelescopeBackend::new_sfs(ctx);
         sfs.update_search_query("folder".to_string());
-        sfs.table_state.select(Some(1));
+        sfs.table_state.select(Some(0));
         let resulting_action = sfs.confirm_result();
         //Get the root folder
-        let current_path = env::current_dir().unwrap();
-        let expected_path = current_path.join("tests/folder_2");
+        let root_dir = testing_folder.root_dir.path();
+        let expected_path = root_dir.join("files/folder_2");
         let expected_action = Some(Action::AppAct(AppAction::ShowInFolder(expected_path)));
         assert_eq!(resulting_action, expected_action);
     }
