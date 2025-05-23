@@ -5,7 +5,7 @@ use blaze_explorer_lib::{action::Action, app::App, command::Command};
 use crate::TelescopeWindow;
 //Plugin functions
 pub fn open_sfs(app: &mut App) -> Option<Action> {
-    let ctx = app.get_app_context();
+    let ctx = app.clone();
     let result = access_plugin(app, "Telescope");
     let plugin = match result {
         PluginFetchResult::Err(action) => return action,

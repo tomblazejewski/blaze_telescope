@@ -1,6 +1,7 @@
+pub mod favourites_telescope;
 pub mod sfs_telescope;
 use blaze_explorer_lib::{
-    action::Action, app_context::AppContext, query::Query, themes::CustomTheme, tools::center_rect,
+    action::Action, app::App, query::Query, themes::CustomTheme, tools::center_rect,
 };
 use color_eyre::eyre::Result;
 use ratatui::{
@@ -127,7 +128,7 @@ impl TelescopeBackend {
         Ok(())
     }
 
-    pub fn new_sfs(search_context: AppContext) -> Self {
+    pub fn new_sfs(search_context: App) -> Self {
         //FIXME: Create a separate contructor for each type of search
         Self {
             query: Query::default(),

@@ -21,7 +21,6 @@ use blaze_explorer_lib::plugin::Plugin;
 use blaze_explorer_lib::{
     action::{Action, AppAction},
     app::App,
-    app_context::AppContext,
     custom_action,
     input_machine::input_machine_helpers::convert_str_to_events,
     line_entry::LineEntry,
@@ -159,7 +158,7 @@ pub struct TelescopeWindow {
 }
 
 impl TelescopeWindow {
-    pub fn new_sfs(ctx: AppContext, keymap: HashMap<(Mode, Vec<KeyEvent>), Action>) -> Self {
+    pub fn new_sfs(ctx: App, keymap: HashMap<(Mode, Vec<KeyEvent>), Action>) -> Self {
         TelescopeWindow {
             keymap,
             telescope_backend: TelescopeBackend::new_sfs(ctx),
@@ -264,7 +263,7 @@ mod tests {
         let testing_folder =
             create_custom_testing_folder(vec!["files/", "files/folder_2"]).unwrap();
         app.update_path(testing_folder.root_dir.path().to_path_buf(), None);
-        let ctx = app.get_app_context();
+        let ctx = app.clone();
         let mut sfs = TelescopeBackend::new_sfs(ctx);
         sfs.update_search_query("folder".to_string());
         sfs.table_state.select(Some(0));

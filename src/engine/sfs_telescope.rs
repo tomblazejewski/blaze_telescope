@@ -16,7 +16,7 @@ use rust_search::SearchBuilder;
 
 use blaze_explorer_lib::{
     action::{Action, AppAction},
-    app_context::AppContext,
+    app::App,
 };
 
 use crate::engine::{TelescopeResult, TelescopeSearch};
@@ -29,9 +29,14 @@ pub struct SearchFileshereSearch {
 }
 
 impl SearchFileshereSearch {
-    pub fn new(ctx: AppContext) -> Self {
+    pub fn new(ctx: App) -> Self {
         Self {
-            absolute_directory: ctx.current_directory.display().to_string(),
+            absolute_directory: ctx
+                .clone()
+                .explorer_manager
+                .get_current_path()
+                .display()
+                .to_string(),
             results: Vec::new(),
             last_search_timing: None,
         }
