@@ -1,5 +1,6 @@
 pub mod engine;
 pub mod telescope_commands;
+pub mod utils;
 
 use blaze_explorer_lib::plugin::plugin_commands::{
     PluginConfirmResult, PluginDropSearchChar, PluginNextResult, PluginPreviousResult,
