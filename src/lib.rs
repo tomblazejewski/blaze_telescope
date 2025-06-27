@@ -10,7 +10,7 @@ use blaze_explorer_lib::plugin::plugin_helpers::get_push_on_char_action;
 use blaze_explorer_lib::{create_plugin_action, insert_binding};
 
 use ratatui::crossterm::event::KeyCode;
-use telescope_commands::open_sfs;
+use telescope_commands::{open_search_favourites, open_sfs};
 
 use color_eyre::eyre::Result;
 use engine::TelescopeBackend;
@@ -56,6 +56,10 @@ pub fn get_functionalities() -> HashMap<String, Action> {
     let mut functionality_map = HashMap::new();
     functionality_map.insert("OpenSFS".to_string(), custom_action!(open_sfs));
     functionality_map.insert(
+        "OpenSearchFavourites".to_string(),
+        custom_action!(open_search_favourites),
+    );
+    functionality_map.insert(
         "TelescopeQuit".to_string(),
         create_plugin_action!(PluginQuit),
     );
@@ -83,6 +87,7 @@ pub fn get_functionalities() -> HashMap<String, Action> {
 pub fn get_default_bindings() -> HashMap<(Mode, Vec<KeyEvent>), String> {
     let mut bindings_map = HashMap::new();
     insert_binding!(bindings_map, Mode::Normal, " sg", "OpenSFS");
+    insert_binding!(bindings_map, Mode::Normal, " sf", "OpenSearchFavourites");
     insert_binding!(bindings_map, Mode::PopUp, "<Esc>", "TelescopeQuit");
 
     insert_binding!(bindings_map, Mode::PopUp, "<C-n>", "TelescopeNextResult");
@@ -163,6 +168,14 @@ impl TelescopeWindow {
         TelescopeWindow {
             keymap,
             telescope_backend: TelescopeBackend::new_sfs(ctx),
+            should_quit: false,
+        }
+    }
+
+    pub fn new_search_favourites(ctx: App, keymap: HashMap<(Mode, Vec<KeyEvent>), Action>) -> Self {
+        TelescopeWindow {
+            keymap,
+            telescope_backend: TelescopeBackend::new_search_favourites(ctx),
             should_quit: false,
         }
     }

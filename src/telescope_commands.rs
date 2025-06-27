@@ -18,6 +18,20 @@ pub fn open_sfs(app: &mut App) -> Option<Action> {
     None
 }
 
+pub fn open_search_favourites(app: &mut App) -> Option<Action> {
+    let ctx = app.clone();
+    let result = access_plugin(app, "Telescope");
+    let plugin = match result {
+        PluginFetchResult::Err(action) => return action,
+        PluginFetchResult::Ok(plugin) => plugin,
+    };
+    let popup_keymap = plugin.get_popup_keymap();
+    let popup = Box::new(TelescopeWindow::new_search_favourites(ctx, popup_keymap));
+    app.attach_popup(popup);
+
+    None
+}
+
 //Popup functions
 #[derive(Clone, PartialEq, Debug)]
 pub struct TelescopeUpdateSearchQuery {

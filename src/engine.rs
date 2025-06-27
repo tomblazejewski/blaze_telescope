@@ -137,6 +137,15 @@ impl TelescopeBackend {
             theme: CustomTheme::default(),
         }
     }
+
+    pub fn new_search_favourites(search_context: App) -> Self {
+        Self {
+            query: Query::default(),
+            search: Box::new(favourites_telescope::FavouritesSearch::new(search_context)),
+            table_state: TableState::default(),
+            theme: CustomTheme::default(),
+        }
+    }
 }
 pub trait TelescopeSearch: TelescopeSearchSuper {
     /// Perform necessary actions to return the search results
